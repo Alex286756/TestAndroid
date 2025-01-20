@@ -2,6 +2,8 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -39,8 +41,15 @@ android {
     }
 }
 
-dependencies {
+kapt {
+    correctErrorTypes = true
+}
 
+dependencies {
+    implementation (libs.androidx.runtime.livedata)
+    implementation(libs.hilt.android.v2511)
+    kapt(libs.hilt.android.compiler)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
