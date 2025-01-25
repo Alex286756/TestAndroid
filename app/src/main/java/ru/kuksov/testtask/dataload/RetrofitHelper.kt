@@ -1,14 +1,13 @@
 package ru.kuksov.testtask.dataload
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import ru.kuksov.testtask.entity.Bin
+import javax.inject.Inject
 
-object RetrofitHelper {
-    val baseUrl = "https://lookup.binlist.net/"
+
+class RetrofitHelper @Inject constructor() {
+    private val baseUrl = "https://lookup.binlist.net/"
 
     fun getInstance(): Retrofit {
         return Retrofit.Builder().baseUrl(baseUrl)
@@ -16,20 +15,7 @@ object RetrofitHelper {
             .build()
     }
 
-    fun getBinDataFromApi(id : String) : Bin {
-        val coroutineScope = CoroutineScope(Dispatchers.Main)
-        var result = Bin()
-        val binsApi = this.getInstance().create(BinApi::class.java)
-        coroutineScope.launch(Dispatchers.IO) {
-            val resultApi = binsApi.getBin(id)
-
-            if (resultApi.isSuccessful)
-                 result = bodyToBin(id, resultApi.body()!!)
-        }
-        return result
-    }
-
-    private fun bodyToBin(id: String, body: BinResponse) : Bin {
+    fun bodyToBin(id: String, body: BinResponse) : Bin {
         val resultBin = Bin()
         resultBin.binId = id
         resultBin.numberLength = body.number?.get("length")?.toString()?.toInt()

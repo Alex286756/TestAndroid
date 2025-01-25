@@ -2,6 +2,7 @@ package ru.kuksov.testtask
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -22,32 +24,46 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.core.text.isDigitsOnly
+import androidx.lifecycle.ViewModelProvider
 import dagger.hilt.android.AndroidEntryPoint
-import ru.kuksov.testtask.dataload.RetrofitHelper.getBinDataFromApi
 import ru.kuksov.testtask.repository.BinRepository
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class MainActivity : ComponentActivity() {
+class MainActivity @Inject constructor(
+) : ComponentActivity() {
 
     @Inject
     lateinit var binRepository: BinRepository
 
+    private lateinit var binViewModel: BinViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
+
+        binViewModel = ViewModelProvider(this)[BinViewModel::class.java]
+
         setContent {
             StartPage()
         }
 
+        binViewModel.responseData.observe(this) {
+            if (it != null) {
+                binRepository.addBin(it)
+                binViewModel.setNewId(it.binId.toString())
+            } else {
+                Toast.makeText(this, "There is some error!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     @Composable
-    @Preview(showBackground = true)
-    fun StartPage(viewModel: BinViewModel = viewModel()) {
+    fun StartPage() {
         val tfValue = remember{mutableStateOf("")}
         Column (modifier = Modifier
             .verticalScroll(rememberScrollState())
@@ -63,18 +79,21 @@ class MainActivity : ComponentActivity() {
             )
             TextField(
                 value = tfValue.value,
-                onValueChange = {newText -> tfValue.value = newText},
+                onValueChange = {
+                    if (it.isDigitsOnly() and (it.length<=8))
+                        tfValue.value = it
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(Color.White),
                 singleLine = true,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                placeholder = { Text("12345678") },
             )
             Button(
                 onClick = {
                     if (tfValue.value.matches("[0-9]{8}".toRegex())) {
-                        viewModel.setNewId(tfValue.value)
-                        val bin = getBinDataFromApi(tfValue.value)
-                        binRepository.addBin(bin)
+                        binViewModel.getDataFromAPI(tfValue.value)
                     }
                 },
                 modifier = Modifier
@@ -86,7 +105,7 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            BinFields(viewModel.id)
+            BinFields(binViewModel.id)
 
             Button(
                 onClick = {
