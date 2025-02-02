@@ -55,11 +55,15 @@ class MainActivity @Inject constructor(
         binViewModel.responseData.observe(this) {
             if (it != null) {
                 binRepository.addBin(it)
-                binViewModel.setNewId(it.binId.toString())
+//                binViewModel.setNewId(it.binId.toString())
             } else {
                 Toast.makeText(this, "There is some error!", Toast.LENGTH_SHORT).show()
             }
         }
+
+//        binViewModel.id.observe(this) {
+//
+//        }
     }
 
     @Composable
@@ -105,7 +109,7 @@ class MainActivity @Inject constructor(
                 )
             }
 
-            BinFields(binViewModel.id)
+            BinFields()
 
             Button(
                 onClick = {
@@ -126,43 +130,44 @@ class MainActivity @Inject constructor(
     }
 
     @Composable
-    private fun BinFields(id : String) {
-        val bin = binRepository.getBinById(id)
-
-        if (bin.binId?.length != 8)
+    private fun BinFields() {
+//        val binId = binViewModel.id.value.toString()
+//        val bin = binRepository.getBinById(binId)
+//
+//        if (bin.binId?.length != 8)
             return
-        Row {
-            Text(
-                text = "Данные по id = ",
-                fontSize = 28.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-            )
-            Text(
-                text = id,
-                fontSize = 28.sp,
-                modifier = Modifier
-                    .padding(10.dp)
-            )
-        }
-        for (dataRecord in bin.getValues()) {
-            Row ( modifier = Modifier.fillMaxWidth() ) {
-                Text (
-                    text = dataRecord.key,
-                    fontSize = 28.sp,
-                    modifier = Modifier
-                        .border(width = 1.dp, color = Color.Blue)
-                        .padding(10.dp)
-                    )
-                Text(
-                    text = dataRecord.value,
-                    fontSize = 28.sp,
-                    modifier = Modifier
-                        .border(width = 1.dp, color = Color.Blue)
-                        .padding(10.dp)
-                )
-            }
-        }
+//        Row {
+//            Text(
+//                text = "Данные по id = ",
+//                fontSize = 28.sp,
+//                modifier = Modifier
+//                    .padding(10.dp)
+//            )
+//            Text(
+//                text = binId,
+//                fontSize = 28.sp,
+//                modifier = Modifier
+//                    .padding(10.dp)
+//            )
+//        }
+//        for (dataRecord in bin.getValues()) {
+//            Row ( modifier = Modifier.fillMaxWidth() ) {
+//                Text (
+//                    text = dataRecord.key,
+//                    fontSize = 28.sp,
+//                    modifier = Modifier
+//                        .border(width = 1.dp, color = Color.Blue)
+//                        .padding(10.dp)
+//                    )
+//                Text(
+//                    text = dataRecord.value,
+//                    fontSize = 28.sp,
+//                    modifier = Modifier
+//                        .border(width = 1.dp, color = Color.Blue)
+//                        .padding(10.dp)
+//                )
+//            }
+//        }
     }
 
 }

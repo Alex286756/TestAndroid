@@ -1,6 +1,7 @@
 package ru.kuksov.testtask.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -13,7 +14,7 @@ import javax.inject.Singleton
 class BinRepository @Inject constructor(private val binDao: BinDao) {
     private val coroutineScope = CoroutineScope(Dispatchers.Main)
 
-    val binList: LiveData<List<Bin>> = binDao.getAllBins()
+    val binList : LiveData<List<Bin>> = binDao.getAllBins()
 
     fun addBin(bin: Bin) {
         coroutineScope.launch(Dispatchers.IO) {
